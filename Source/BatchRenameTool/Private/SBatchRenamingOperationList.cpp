@@ -26,7 +26,6 @@
 #include "BatchRenameToolModel.h"
 #include "BatchRenamingOperation.h"
 #include "SlateOptMacros.h"
-#include "Widgets/Input/SSearchBox.h"
 #include "SPositiveActionButton.h"
 
 #define LOCTEXT_NAMESPACE "BatchRenameTool"

@@ -8,16 +8,10 @@
 #include "Styling/StyleColors.h"
 
 #include "BatchRenameToolModel.h"
-#include "BlueprintActionDatabase.h"
 #include "EditorUtilityLibrary.h"
 #include "IAssetTools.h"
 #include "SBatchRenamingOperationList.h"
 #include "SBatchRenamingOperationDetails.h"
-
-
-static const FName AssetTableTabId("BatchRenameEditorToolkit_AssetTable");
-static const FName MethodListTabId("BatchRenameEditorToolkit_MethodList");
-static const FName OperationDetailsTabId("BatchRenameEditorToolkit_OperationDetails");
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -30,64 +24,22 @@ SBatchRenameTabMain::SBatchRenameTabMain():
 
 void SBatchRenameTabMain::Construct(const FArguments& InArgs)
 {
+	ChildSlot
+	[
+		// Populate the widget
 
-	//原来的分页：
-	const TSharedRef<SDockTab> NomadTab = SNew(SDockTab)
-		.TabRole(ETabRole::NomadTab);
-
-	//创建TabManager
-	if (!TabManager.IsValid())
-	{
-		TabManager = FGlobalTabmanager::Get()->NewTabManager(NomadTab);
-	}
-	
-	//创建布局：
-	if (!TabLayout.IsValid())
-	{
-		TabLayout = FTabManager::NewLayout("TestLayoutWindow")
-			->AddArea
-			(
-			FTabManager::NewPrimaryArea()
-			->SetOrientation(Orient_Horizontal)
-			->Split
-			(
-				FTabManager::NewStack()
-				->SetSizeCoefficient(0.7f)
-				->SetHideTabWell(true)
-				->AddTab(AssetTableTabId, ETabState::OpenedTab)
-			)
-			->Split
-			(
-				FTabManager::NewSplitter()
-				->SetOrientation(Orient_Vertical)
-				->SetSizeCoefficient(0.3f)
-				->Split
-				(
-				FTabManager::NewStack()
-					->SetSizeCoefficient(0.6f)
-					->SetHideTabWell(true)
-					->AddTab(MethodListTabId, ETabState::OpenedTab)
-				)
-				->Split
-				(
-					FTabManager::NewStack()
-					->SetSizeCoefficient(0.4f)
-					->SetHideTabWell(true)
-					->AddTab(OperationDetailsTabId, ETabState::OpenedTab)
-			)
-		)
-			);
-	
-	}
-
-	//AssetTableTabId的内容：
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(AssetTableTabId, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs& SpawnTabArgs)
-	{
-		return
-			SNew(SDockTab)
-			.TabRole(ETabRole::NomadTab)
+		SNew(SBox)
+		.MaxDesiredWidth(1400.0f)
+		.MaxDesiredHeight(500.0f)
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Fill)
+		[
+			SNew(SSplitter)
+			//left
+			.PhysicalSplitterHandleSize(3.0f)
+			.Style(FAppStyle::Get(), "DetailsView.Splitter")
+			+ SSplitter::Slot().Value(0.7f)
 			[
-
 				SNew(SVerticalBox)
 				+SVerticalBox::Slot()
 				.HAlign(HAlign_Center)
@@ -110,43 +62,26 @@ void SBatchRenameTabMain::Construct(const FArguments& InArgs)
 				[
 					ConstructAssetTable()
 				]
-				
-			];
-	}))
-	.SetDisplayName(LOCTEXT("AssetTableTab", "AssetTableTab"))
-	.SetMenuType(ETabSpawnerMenuType::Hidden);
+			]
 
-	//MethodListTabId的内容：
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(MethodListTabId, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs& SpawnTabArgs)
-		{
-			return
-				SNew(SDockTab)
-				.TabRole(ETabRole::NomadTab)
-				[
-					SAssignNew(OperationList, SBatchRenamingOperationList, Model)
-				];
-		}))
-		.SetDisplayName(LOCTEXT("MethodListTab", "MethodListTab"))
-			.SetMenuType(ETabSpawnerMenuType::Hidden);
-	
-	//OperationDetailsTabId的内容：
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(OperationDetailsTabId, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs& SpawnTabArgs)
-		{
-			return
-				SNew(SDockTab)
-				.TabRole(ETabRole::NomadTab)
-				[
-					SNew(SBatchRenamingOperationDetails, Model)
-				];
-		}))
-		.SetDisplayName(LOCTEXT("OperationDetailsTab", "OperationDetailsTab"))
-			.SetMenuType(ETabSpawnerMenuType::Hidden);
-
-	// TSharedRef<SWidget> TabContents = TabManager->RestoreFrom(TabLayout.ToSharedRef(), TSharedPtr<SWindow>()).ToSharedRef();
-	ChildSlot
-	[
-		// Populate the widget
-		TabManager->RestoreFrom(TabLayout.ToSharedRef(), TSharedPtr<SWindow>()).ToSharedRef()
+			//Right
+			+ SSplitter::Slot().Value(0.3f)
+			[
+					SNew(SSplitter)
+					.Orientation(EOrientation::Orient_Vertical)
+					.PhysicalSplitterHandleSize(3.0f)
+					.Style(FAppStyle::Get(), "DetailsView.Splitter")
+					+ SSplitter::Slot().Value(0.6f)
+					[
+						SAssignNew(OperationList, SBatchRenamingOperationList, Model)
+					]
+					+ SSplitter::Slot().Value(0.4f)
+					[
+						SNew(SBatchRenamingOperationDetails, Model)
+					]
+					
+				]
+			]
 	];
 
 }
@@ -209,9 +144,10 @@ TSharedRef<SHorizontalBox> SBatchRenameTabMain::ConstructOperationButton()
 		+SHorizontalBox::Slot()
 		.HAlign(HAlign_Left)
 		.AutoWidth()
+		.Padding(FVector2D(2.f, 0.f))
 		[
 			SNew(SButton)
-			.ContentPadding(FMargin(FVector2D(0.f, 5.f)))
+			.ContentPadding(FMargin(FVector2D(20.f, 10.f)))
 			.OnClicked_Raw(this,&SBatchRenameTabMain::OnAddAssets)
 			[
 				SNew(SHorizontalBox)
@@ -240,9 +176,10 @@ TSharedRef<SHorizontalBox> SBatchRenameTabMain::ConstructOperationButton()
 		+SHorizontalBox::Slot()
 		.HAlign(HAlign_Left)
 		.AutoWidth()
+		.Padding(FVector2D(2.f, 0.f))
 		[
 			SNew(SButton)
-			.ContentPadding(FMargin(FVector2D(0.f, 5.f)))
+			.ContentPadding(FMargin(FVector2D(20.f, 10.f)))
 			.OnClicked_Raw(this, &SBatchRenameTabMain::OnDeleteSelect)
 			[
 				SNew(SHorizontalBox)
@@ -272,9 +209,10 @@ TSharedRef<SHorizontalBox> SBatchRenameTabMain::ConstructOperationButton()
 		+SHorizontalBox::Slot()
 		.HAlign(HAlign_Left)
 		.AutoWidth()
+		.Padding(FVector2D(2.f, 0.f))
 		[
 			SNew(SButton)
-			.ContentPadding(FMargin(FVector2D(0.f, 5.f)))
+			.ContentPadding(FMargin(FVector2D(20.f, 10.f)))
 			.OnClicked_Raw(this, &SBatchRenameTabMain::OnClearTable)
 			[
 				SNew(SHorizontalBox)
@@ -303,9 +241,10 @@ TSharedRef<SHorizontalBox> SBatchRenameTabMain::ConstructOperationButton()
 		+SHorizontalBox::Slot()
 		.HAlign(HAlign_Left)
 		.AutoWidth()
+		.Padding(FVector2D(2.f, 0.f))
 		[
 			SNew(SButton)
-			.ContentPadding(FMargin(FVector2D(0.f, 5.f)))
+			.ContentPadding(FMargin(FVector2D(20.f, 10.f)))
 			.OnClicked_Raw(this, &SBatchRenameTabMain::Run)
 			[
 				SNew(SHorizontalBox)

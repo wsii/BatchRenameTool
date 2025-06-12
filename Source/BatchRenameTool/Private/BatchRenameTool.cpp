@@ -12,7 +12,7 @@
 #include "ToolMenus.h"
 #include "Styling/StyleColors.h"
 #include "Subsystems/AssetEditorSubsystem.h"
-#include "SBatchRenameTabMain.h"
+#include "SBatchRenameMain.h"
 
 static const FName BatchRenameToolTabName("BatchRenameTool");
 
@@ -70,7 +70,7 @@ TSharedRef<SDockTab> FBatchRenameToolModule::OnSpawnPluginTab(const FSpawnTabArg
 	return SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
 		[
-			SNew(SBatchRenameTabMain)
+			SNew(SBatchRenameMain)
 		];
 	
 }

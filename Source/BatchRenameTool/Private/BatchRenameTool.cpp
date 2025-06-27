@@ -87,24 +87,61 @@ void FBatchRenameToolModule::RegisterMenus()
 	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
 	FToolMenuOwnerScoped OwnerScoped(this);
 
+	bool IsMenuExist = UToolMenus::Get()->IsMenuRegistered("LevelEditor.MainMenu.UPTool");
+	if (!IsMenuExist)
 	{
-		UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Window");
+		// 菜单不存在，进行注册
+		UToolMenu* Menu = UToolMenus::Get()->RegisterMenu("LevelEditor.MainMenu.UPTool");
 		{
-			FToolMenuSection& Section = Menu->FindOrAddSection("WindowLayout");
+			FToolMenuSection& Section = Menu->FindOrAddSection("BatchRenameTool",
+											 LOCTEXT("UPTool", "BatchRenameTool"),
+											 FToolMenuInsert(NAME_None, EToolMenuInsertType::First));
+	
+			Section.AddMenuEntryWithCommandList(FBatchRenameToolCommands::Get().OpenTool, PluginCommands);
+		}
+		
+		//将创建的菜单添加到已有的菜单中
+		UToolMenu* MenuMain = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu");
+	
+		MenuMain->AddSubMenu(
+			"MainMenu",
+			NAME_None,
+			"UPTool",
+			LOCTEXT("UPTool_Entry", "UPTool"),
+			LOCTEXT("UPTool_Entry_Tip", "Extend UPTool Menu"));
+	}
+	else
+	{
+		UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.UPTool");
+		{
+			// FToolMenuSection& Section = Menu->FindOrAddSection("Editor");
+			FToolMenuSection& Section = Menu->FindOrAddSection("BatchRenameTool",
+											 LOCTEXT("UPTool", "BatchRenameTool"),
+											 FToolMenuInsert(NAME_None, EToolMenuInsertType::First));
 			Section.AddMenuEntryWithCommandList(FBatchRenameToolCommands::Get().OpenTool, PluginCommands);
 		}
 	}
 
-	{
-		UToolMenu* ToolbarMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar.PlayToolBar");
-		{
-			FToolMenuSection& Section = ToolbarMenu->FindOrAddSection("PluginTools");
-			{
-				FToolMenuEntry& Entry = Section.AddEntry(FToolMenuEntry::InitToolBarButton(FBatchRenameToolCommands::Get().OpenTool));
-				Entry.SetCommandList(PluginCommands);
-			}
-		}
-	}
+	
+
+	// {
+	// 	UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Window");
+	// 	{
+	// 		FToolMenuSection& Section = Menu->FindOrAddSection("WindowLayout");
+	// 		Section.AddMenuEntryWithCommandList(FBatchRenameToolCommands::Get().OpenTool, PluginCommands);
+	// 	}
+	// }
+	//
+	// {
+	// 	UToolMenu* ToolbarMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar.PlayToolBar");
+	// 	{
+	// 		FToolMenuSection& Section = ToolbarMenu->FindOrAddSection("PluginTools");
+	// 		{
+	// 			FToolMenuEntry& Entry = Section.AddEntry(FToolMenuEntry::InitToolBarButton(FBatchRenameToolCommands::Get().OpenTool));
+	// 			Entry.SetCommandList(PluginCommands);
+	// 		}
+	// 	}
+	// }
 }
 
 

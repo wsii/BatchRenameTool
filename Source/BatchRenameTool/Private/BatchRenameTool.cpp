@@ -95,7 +95,7 @@ void FBatchRenameToolModule::RegisterMenus()
 		{
 			FToolMenuSection& Section = Menu->FindOrAddSection("BatchRenameTool",
 											 LOCTEXT("UPTool", "BatchRenameTool"),
-											 FToolMenuInsert(NAME_None, EToolMenuInsertType::First));
+											 FToolMenuInsert(NAME_None, EToolMenuInsertType::Default));
 	
 			Section.AddMenuEntryWithCommandList(FBatchRenameToolCommands::Get().OpenTool, PluginCommands);
 		}
@@ -117,7 +117,7 @@ void FBatchRenameToolModule::RegisterMenus()
 			// FToolMenuSection& Section = Menu->FindOrAddSection("Editor");
 			FToolMenuSection& Section = Menu->FindOrAddSection("BatchRenameTool",
 											 LOCTEXT("UPTool", "BatchRenameTool"),
-											 FToolMenuInsert(NAME_None, EToolMenuInsertType::First));
+											 FToolMenuInsert(NAME_None, EToolMenuInsertType::Default));
 			Section.AddMenuEntryWithCommandList(FBatchRenameToolCommands::Get().OpenTool, PluginCommands);
 		}
 	}
